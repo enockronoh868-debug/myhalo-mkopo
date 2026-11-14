@@ -1,0 +1,11 @@
+{
+  "name": "myhalo-mkopo",
+  "version": "1.0.0",
+  "description": "MyHalo Loan App",
+  "engines": {
+    "node": "26.x"
+  },
+  "dependencies": {
+    "@vercel/kv": "^2.0.0"
+  }
+}
