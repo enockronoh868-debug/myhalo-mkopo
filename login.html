@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halopesa - Ingia</title>
+    <style>
+        * { box-sizing: border-box; font-family: sans-serif; }
+        body { margin: 0; background-color: white; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 400px; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .back { font-size: 24px; cursor: pointer; color: #333; text-decoration: none; }
+        .lang { font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .flag { width: 20px; height: 15px; background: linear-gradient(to bottom right, green 33%, yellow 33%, yellow 66%, blue 66%); }
+        h1 { font-size: 28px; color: #1a1a2e; margin-bottom: 10px; }
+        p { color: #555; font-size: 16px; margin-bottom: 30px; line-height: 1.4; }
+        .input-group { display: flex; border: 1px solid #E65C00; border-radius: 8px; padding: 5px; margin-bottom: 20px; }
+        .country-code { display: flex; align-items: center; gap: 5px; padding: 10px; background: #f9f9f9; border-right: 1px solid #E65C00; font-weight: bold; border-radius: 4px; }
+        .input-group input { border: none; padding: 15px; flex-grow: 1; font-size: 16px; outline: none; }
+        .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 30px; }
+        .checkbox-group input { width: 20px; height: 20px; accent-color: #E65C00; margin-top: 3px; }
+        .checkbox-group label { font-size: 14px; color: #333; }
+        .checkbox-group a { color: #E65C00; text-decoration: none; }
+        .btn-main { width: 100%; background-color: #e0e0e0; color: #999; font-size: 16px; font-weight: bold; padding: 15px; border: none; border-radius: 25px; cursor: pointer; }
+        .btn-main:not(:disabled) { background-color: #E65C00; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back">&#8592;</a>
+            <div class="lang"><div class="flag"></div> SW &#9662;</div>
+        </div>
+        <h1>Ingiza namba</h1>
+        <p>Ingia kuangalia vipengele vya MyHalo</p>
+        <div class="input-group">
+            <div class="country-code"><div class="flag"></div> +255 &#9662;</div>
+            <input type="tel" id="phone" placeholder="Ingiza nambari ya simu" oninput="document.getElementById('btnNext').disabled = this.value.length < 9">
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="terms">
+            <label for="terms">Nakubaliana na <a href="#">masharti ya matumizi</a></label>
+        </div>
+        <button id="btnNext" class="btn-main" disabled onclick="
+            var phone = document.getElementById('phone').value;
+            var terms = document.getElementById('terms').checked;
+            if(!terms) { alert('Tafadhali kubali masharti ya matumizi.'); return; }
+            sessionStorage.setItem('userPhone', '+255' + phone);
+            window.location.href = 'pin.html';
+        ">Endelea</button>
+    </div>
+</body>
+</html>
