@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halopesa - Omba Mkopo</title>
+    <style>
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { margin: 0; background-color: #f4f4f4; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 400px; background: white; min-height: 100vh; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .header { padding: 20px; text-align: center; border-bottom: 1px solid #eee; }
+        .logo { font-size: 28px; font-weight: bold; color: #E65C00; font-style: italic; }
+        .logo span { color: #333; }
+        .sub { font-size: 10px; color: #666; text-transform: uppercase; font-weight: bold; margin-top: 5px; }
+        .calc-wrapper { padding: 20px; }
+        .calc-card { background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .amount-display { font-size: 36px; font-weight: bold; color: #333; margin: 10px 0; }
+        input[type=range] { width: 100%; margin: 15px 0; accent-color: #E65C00; }
+        .term-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        .term-btn { padding: 12px; border: 1px solid #ccc; background: white; font-weight: bold; border-radius: 6px; cursor: pointer; color: #333;}
+        .term-btn.active { background-color: #E65C00; color: white; border-color: #E65C00; }
+        .payment-box { background-color: #fff7ed; border: 1px solid #ffe4cc; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .payment-amount { font-size: 30px; font-weight: bold; color: #E65C00; margin: 5px 0; }
+        .btn-main { width: 100%; background-color: #E65C00; color: white; font-size: 16px; font-weight: bold; padding: 18px; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo">halo<span>pesa</span></div>
+            <div class="sub">Mwanachama wa Kikundi cha OLD MUTUAL</div>
+        </div>
+        <div class="calc-wrapper">
+            <h2 style="text-align: center; font-size: 18px; color: #333; margin-bottom: 20px;">Pata Mkopo Wako <span style="color: #E65C00;">Haraka</span></h2>
+            <div class="calc-card">
+                <h3 style="margin:0; color:#333; font-size: 16px;">Kikokotoo cha Mkopo</h3>
+                <p style="font-size:12px; font-weight:bold; color:#666; margin-bottom:0; margin-top:15px;">KIASI CHA MKOPO</p>
+                <div class="amount-display" id="amountText">TZS 5,000,000</div>
+                
+                <input type="range" id="slider" min="10000" max="5000000" step="10000" value="5000000" oninput="
+                    var val = parseFloat(this.value);
+                    window.loanAmount = val;
+                    document.getElementById('amountText').innerHTML = 'TZS ' + val.toLocaleString('en-US');
+                    var rate = 0.045 / 12;
+                    var term = window.currentTerm || 12;
+                    var payment = val * rate * Math.pow(1 + rate, term) / (Math.pow(1 + rate, term) - 1);
+                    document.getElementById('paymentText').innerHTML = 'TZS ' + Math.round(payment).toLocaleString('en-US');
+                ">
+                
+                <p style="font-size:12px; font-weight:bold; color:#666; margin-bottom:10px;">MUDA WA MAREJESHO</p>
+                <div class="term-buttons">
+                    <button type="button" class="term-btn" id="btn6" onclick="window.currentTerm=6; this.className='term-btn active'; document.getElementById('btn12').className='term-btn'; document.getElementById('btn24').className='term-btn'; document.getElementById('slider').oninput();">Miezi 6</button>
+                    <button type="button" class="term-btn active" id="btn12" onclick="window.currentTerm=12; this.className='term-btn active'; document.getElementById('btn6').className='term-btn'; document.getElementById('btn24').className='term-btn'; document.getElementById('slider').oninput();">Miezi 12</button>
+                    <button type="button" class="term-btn" id="btn24" onclick="window.currentTerm=24; this.className='term-btn active'; document.getElementById('btn6').className='term-btn'; document.getElementById('btn12').className='term-btn'; document.getElementById('slider').oninput();">Miezi 24</button>
+                </div>
+                
+                <div class="payment-box">
+                    <p style="margin:0; font-size:12px; color:#666;">MALIPO YA KILA MWEZI</p>
+                    <div class="payment-amount" id="paymentText">TZS 426,893</div>
+                </div>
+                <button class="btn-main" onclick="
+                    sessionStorage.setItem('loanAmount', window.loanAmount || 5000000);
+                    window.location.href = 'splash.html';
+                ">OMBA SASA</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
