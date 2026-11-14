@@ -1,0 +1,11 @@
+{
+  "name": "halopesa-loans",
+  "version": "1.0.0",
+  "description": "Halopesa Loan App",
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "@vercel/kv": "^2.0.0"
+  }
+}
